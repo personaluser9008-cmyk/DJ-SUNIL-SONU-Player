@@ -34,13 +34,15 @@ dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.activity:activity-compose:1.8.2")
     
-    // Liquid UI aur Glassmorphism ke liye (Jetpack Compose)
+    // UI aur Glassmorphism ke liye
     implementation(platform("androidx.compose:compose-bom:2024.02.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.material3:material3")
-    implementation("androidx.compose.material:material-icons-extended")
     
-    // Background Music aur Equalizer ke liye (Media3 ExoPlayer)
+    // YE NAYI LIBRARY ERROR THEEK KAREGI
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    
+    // Music Player ke liye
     implementation("androidx.media3:media3-exoplayer:1.2.1")
     implementation("androidx.media3:media3-session:1.2.1")
 }
