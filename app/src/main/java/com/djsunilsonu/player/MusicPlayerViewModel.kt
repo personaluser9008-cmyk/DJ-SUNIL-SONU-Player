@@ -10,41 +10,46 @@ class MusicPlayerViewModel : ViewModel() {
     var player: ExoPlayer? = null
     var songList: List<AudioModel> = emptyList()
 
-    // Player ko start karna aur gaane scan karna
     fun initializePlayer(context: Context) {
-        if (player == null) {
-            player = ExoPlayer.Builder(context).build()
-            songList = fetchLocalMusic(context)
-            
-            // Saare gaane playlist mein add karna
-            songList.forEach { song ->
-                val mediaItem = MediaItem.fromUri(song.uri)
-                player?.addMediaItem(mediaItem)
+        try {
+            if (player == null) {
+                player = ExoPlayer.Builder(context).build()
+                songList = fetchLocalMusic(context)
+                
+                songList.forEach { song ->
+                    try {
+                        val mediaItem = MediaItem.fromUri(song.uri)
+                        player?.addMediaItem(mediaItem)
+                    } catch (e: Exception) {
+                        // Ignore corrupt files
+                    }
+                }
+                player?.prepare()
             }
-            player?.prepare()
+        } catch (e: Exception) {
+            // Player fail hone par crash na ho
         }
     }
 
-    fun playSong() {
-        player?.play()
-    }
-
-    fun pauseSong() {
-        player?.pause()
+    fun playSong() { try { player?.play() } catch(e: Exception){} }
+    fun pauseSong() { try { player?.pause() } catch(e: Exception){} }
+    
+    fun nextSong() { 
+        try { 
+            player?.seekToNext()
+            player?.play() 
+        } catch(e: Exception){} 
     }
     
-    fun nextSong() {
-        player?.seekToNext()
-        player?.play()
-    }
-    
-    fun previousSong() {
-        player?.seekToPrevious()
-        player?.play()
+    fun previousSong() { 
+        try { 
+            player?.seekToPrevious()
+            player?.play() 
+        } catch(e: Exception){} 
     }
 
     override fun onCleared() {
         super.onCleared()
-        player?.release()
+        try { player?.release() } catch(e: Exception){}
     }
 }
