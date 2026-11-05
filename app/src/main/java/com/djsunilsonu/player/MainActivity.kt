@@ -1,11 +1,16 @@
 package com.djsunilsonu.player
 
+import android.Manifest
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -15,15 +20,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,13 +39,12 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MaterialTheme {
-                ExactMatchGlassmorphismUI()
+                MainAppScreen()
             }
         }
     }
 }
 
-// Helper function Glass effect ke liye
 @Composable
 fun GlassBox(modifier: Modifier = Modifier, shape: androidx.compose.ui.graphics.Shape, content: @Composable () -> Unit) {
     Box(
@@ -52,14 +59,39 @@ fun GlassBox(modifier: Modifier = Modifier, shape: androidx.compose.ui.graphics.
 }
 
 @Composable
-fun ExactMatchGlassmorphismUI() {
-    // Exact Background (Light Cyan -> Purple -> Pink -> Blue)
+fun MainAppScreen(musicViewModel: MusicPlayerViewModel = viewModel()) {
+    val context = LocalContext.current
+    
+    // Permission mangne ka logic
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            musicViewModel.initializePlayer(context) // Permission milte hi player chalu
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        // Android 13+ ke liye READ_MEDIA_AUDIO, purane ke liye READ_EXTERNAL_STORAGE
+        val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Manifest.permission.READ_MEDIA_AUDIO
+        } else {
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        }
+        permissionLauncher.launch(permission)
+    }
+
+    ExactMatchGlassmorphismUI(musicViewModel)
+}
+
+@Composable
+fun ExactMatchGlassmorphismUI(musicViewModel: MusicPlayerViewModel) {
     val bgGradient = Brush.linearGradient(
         colors = listOf(
-            Color(0xFF70A8F8), // Soft Light Blue
-            Color(0xFF9868EA), // Soft Purple
-            Color(0xFFE893D6), // Soft Pink
-            Color(0xFF6B8DF2)  // Deep Blue
+            Color(0xFF70A8F8), 
+            Color(0xFF9868EA), 
+            Color(0xFFE893D6), 
+            Color(0xFF6B8DF2)
         )
     )
 
@@ -72,19 +104,10 @@ fun ExactMatchGlassmorphismUI() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // --- 1. TOP HEADER ---
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Profile
-                Box(
-                    modifier = Modifier.size(52.dp).clip(CircleShape).background(Brush.linearGradient(listOf(Color(0xFFFA709A), Color(0xFF4A00E0)))),
-                    contentAlignment = Alignment.Center
-                ) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Box(modifier = Modifier.size(52.dp).clip(CircleShape).background(Brush.linearGradient(listOf(Color(0xFFFA709A), Color(0xFF4A00E0)))), contentAlignment = Alignment.Center) {
                     Icon(Icons.Rounded.Person, contentDescription = null, tint = Color.White, modifier = Modifier.size(30.dp))
                 }
-
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text("DJ SUNIL SONU", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
@@ -93,9 +116,7 @@ fun ExactMatchGlassmorphismUI() {
                     }
                     Text("Music is Life... ♫", color = Color.White.copy(alpha = 0.9f), fontSize = 13.sp)
                 }
-
                 Row {
-                    // Bell Icon with Red 3
                     Box(contentAlignment = Alignment.TopEnd) {
                         GlassBox(modifier = Modifier.size(46.dp), shape = CircleShape) {
                             Icon(Icons.Rounded.Notifications, contentDescription = null, tint = Color.White)
@@ -105,7 +126,6 @@ fun ExactMatchGlassmorphismUI() {
                         }
                     }
                     Spacer(modifier = Modifier.width(10.dp))
-                    // Settings Icon
                     GlassBox(modifier = Modifier.size(46.dp), shape = CircleShape) {
                         Icon(Icons.Rounded.Tune, contentDescription = null, tint = Color.White)
                     }
@@ -116,12 +136,7 @@ fun ExactMatchGlassmorphismUI() {
 
             // --- 2. MENU TABS ---
             GlassBox(modifier = Modifier.fillMaxWidth().height(46.dp), shape = RoundedCornerShape(24.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    // Active Tab
+                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
                     Box(modifier = Modifier.weight(1.2f).fillMaxHeight().clip(RoundedCornerShape(24.dp)).background(Brush.horizontalGradient(listOf(Color(0xFF9868EA), Color(0xFF4A90E2)))), contentAlignment = Alignment.Center) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Rounded.GraphicEq, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
@@ -145,35 +160,28 @@ fun ExactMatchGlassmorphismUI() {
 
             Spacer(modifier = Modifier.height(30.dp))
 
-            // --- 3. CENTER VINYL WITH SIDE BUTTONS ---
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Left Floating Button
-                GlassBox(modifier = Modifier.size(55.dp), shape = CircleShape) {
+            // --- 3. CENTER VINYL WITH FLOATING BUTTONS ---
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
+                // PREVIOUS BUTTON CONNECTION
+                GlassBox(modifier = Modifier.size(55.dp).clickable { musicViewModel.previousSong() }, shape = CircleShape) {
                     Icon(Icons.Rounded.FastRewind, contentDescription = null, tint = Color.White, modifier = Modifier.size(28.dp))
                 }
                 
-                // Central Glowing Vinyl
                 Box(
-                    modifier = Modifier
-                        .size(220.dp)
-                        .clip(CircleShape)
-                        .background(Brush.radialGradient(listOf(Color(0xFF2B2E4A), Color(0xFF11111A))))
-                        .border(3.dp, Brush.linearGradient(listOf(Color(0xFF00E5FF), Color(0xFFE285C5))), CircleShape),
+                    modifier = Modifier.size(220.dp).clip(CircleShape).background(Brush.radialGradient(listOf(Color(0xFF2B2E4A), Color(0xFF11111A)))).border(3.dp, Brush.linearGradient(listOf(Color(0xFF00E5FF), Color(0xFFE285C5))), CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Box(modifier = Modifier.size(170.dp).border(1.dp, Color.White.copy(alpha = 0.15f), CircleShape))
                     Box(modifier = Modifier.size(120.dp).border(1.dp, Color.White.copy(alpha = 0.1f), CircleShape))
-                    Box(modifier = Modifier.size(70.dp).clip(CircleShape).background(Brush.radialGradient(listOf(Color(0xFF8B5BEA), Color(0xFF2B2E4A)))), contentAlignment = Alignment.Center) {
+                    
+                    // PLAY BUTTON (CENTER) CONNECTION
+                    Box(modifier = Modifier.size(70.dp).clip(CircleShape).background(Brush.radialGradient(listOf(Color(0xFF8B5BEA), Color(0xFF2B2E4A)))).clickable { musicViewModel.playSong() }, contentAlignment = Alignment.Center) {
                         Icon(Icons.Rounded.MusicNote, contentDescription = null, tint = Color.White, modifier = Modifier.size(36.dp))
                     }
                 }
 
-                // Right Floating Button
-                GlassBox(modifier = Modifier.size(55.dp), shape = CircleShape) {
+                // NEXT BUTTON CONNECTION
+                GlassBox(modifier = Modifier.size(55.dp).clickable { musicViewModel.nextSong() }, shape = CircleShape) {
                     Icon(Icons.Rounded.FastForward, contentDescription = null, tint = Color.White, modifier = Modifier.size(28.dp))
                 }
             }
@@ -188,7 +196,7 @@ fun ExactMatchGlassmorphismUI() {
                             Box(modifier = Modifier.size(56.dp).clip(RoundedCornerShape(12.dp)).background(Brush.linearGradient(listOf(Color(0xFF00C6FF), Color(0xFF0072FF)))))
                             Spacer(modifier = Modifier.width(16.dp))
                             Column {
-                                Text("DJ Sunil Sonu - Desi Bass Blast", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                Text("DJ Sunil Sonu - Desi Bass", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                                 Text("DJ SUNIL SONU • Bass Edition", color = Color.White.copy(alpha = 0.8f), fontSize = 13.sp)
                             }
                         }
@@ -197,7 +205,6 @@ fun ExactMatchGlassmorphismUI() {
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    // Progress Bar
                     Box(modifier = Modifier.fillMaxWidth().height(4.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.3f))) {
                         Box(modifier = Modifier.fillMaxWidth(0.45f).height(4.dp).clip(CircleShape).background(Brush.horizontalGradient(listOf(Color.Cyan, Color.Magenta))))
                         Box(modifier = Modifier.padding(start = 140.dp).size(12.dp).offset(y = (-4).dp).clip(CircleShape).background(Color.White))
@@ -209,14 +216,16 @@ fun ExactMatchGlassmorphismUI() {
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Controls Inside Card
+                    // SMALL CONTROLS CONNECTION
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Rounded.Shuffle, contentDescription = null, tint = Color.White.copy(alpha = 0.9f), modifier = Modifier.size(24.dp))
-                        Icon(Icons.Rounded.SkipPrevious, contentDescription = null, tint = Color.White, modifier = Modifier.size(36.dp))
-                        GlassBox(modifier = Modifier.size(60.dp), shape = CircleShape) {
-                            Icon(Icons.Rounded.Pause, contentDescription = null, tint = Color.White, modifier = Modifier.size(32.dp))
+                        Icon(Icons.Rounded.SkipPrevious, contentDescription = null, tint = Color.White, modifier = Modifier.size(36.dp).clickable { musicViewModel.previousSong() })
+                        
+                        GlassBox(modifier = Modifier.size(60.dp).clickable { musicViewModel.pauseSong() }, shape = CircleShape) {
+                            Icon(Icons.Rounded.Pause, contentDescription = "Pause", tint = Color.White, modifier = Modifier.size(32.dp))
                         }
-                        Icon(Icons.Rounded.SkipNext, contentDescription = null, tint = Color.White, modifier = Modifier.size(36.dp))
+                        
+                        Icon(Icons.Rounded.SkipNext, contentDescription = null, tint = Color.White, modifier = Modifier.size(36.dp).clickable { musicViewModel.nextSong() })
                         Icon(Icons.Rounded.Repeat, contentDescription = null, tint = Color.White.copy(alpha = 0.9f), modifier = Modifier.size(24.dp))
                     }
                 }
@@ -224,9 +233,8 @@ fun ExactMatchGlassmorphismUI() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // --- 5. TOGGLES & SETTINGS (4 Glass Pills) ---
+            // --- 5. TOGGLES & SETTINGS ---
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                // Auto-Pause
                 GlassBox(modifier = Modifier.weight(1f).height(65.dp), shape = RoundedCornerShape(20.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 12.dp)) {
                         Icon(Icons.Rounded.Headphones, contentDescription = null, tint = Color.White, modifier = Modifier.size(24.dp))
@@ -239,7 +247,6 @@ fun ExactMatchGlassmorphismUI() {
                     }
                 }
                 Spacer(modifier = Modifier.width(12.dp))
-                // Gapless
                 GlassBox(modifier = Modifier.weight(1f).height(65.dp), shape = RoundedCornerShape(20.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 12.dp)) {
                         Icon(Icons.Rounded.GraphicEq, contentDescription = null, tint = Color.White, modifier = Modifier.size(24.dp))
@@ -253,7 +260,6 @@ fun ExactMatchGlassmorphismUI() {
             Spacer(modifier = Modifier.height(12.dp))
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                // DJ Tempo
                 GlassBox(modifier = Modifier.weight(1f).height(65.dp), shape = RoundedCornerShape(20.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 16.dp)) {
                         Icon(Icons.Rounded.Speed, contentDescription = null, tint = Color(0xFF00E5FF), modifier = Modifier.size(24.dp))
@@ -266,7 +272,6 @@ fun ExactMatchGlassmorphismUI() {
                     }
                 }
                 Spacer(modifier = Modifier.width(12.dp))
-                // Pitch
                 GlassBox(modifier = Modifier.weight(1f).height(65.dp), shape = RoundedCornerShape(20.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 16.dp)) {
                         Icon(Icons.Rounded.BarChart, contentDescription = null, tint = Color.White, modifier = Modifier.size(24.dp))
@@ -282,16 +287,8 @@ fun ExactMatchGlassmorphismUI() {
         }
 
         // --- 6. BOTTOM NAVIGATION BAR ---
-        GlassBox(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 16.dp, start = 16.dp, end = 16.dp)
-                .fillMaxWidth()
-                .height(70.dp),
-            shape = RoundedCornerShape(35.dp)
-        ) {
+        GlassBox(modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 16.dp, start = 16.dp, end = 16.dp).fillMaxWidth().height(70.dp), shape = RoundedCornerShape(35.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
-                // Home (Glowing background)
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.background(Brush.radialGradient(listOf(Color(0xFF8B5BEA).copy(alpha=0.6f), Color.Transparent)), CircleShape).padding(8.dp)) {
                     Icon(Icons.Rounded.Home, contentDescription = null, tint = Color.White, modifier = Modifier.size(24.dp))
                     Text("Home", color = Color.White, fontSize = 11.sp)
