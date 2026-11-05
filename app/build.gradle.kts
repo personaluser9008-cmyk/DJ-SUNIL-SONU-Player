@@ -39,7 +39,10 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.material3:material3")
     
-    // YE NAYI LIBRARY ERROR THEEK KAREGI
+    // YE LINE MISSING THI - Saare extra icons (Pause, Play, Headphones) ke liye
+    implementation("androidx.compose.material:material-icons-extended")
+    
+    // ViewModel ke liye
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     
     // Music Player ke liye
