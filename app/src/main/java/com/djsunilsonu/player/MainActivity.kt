@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -43,10 +44,10 @@ fun UltraPremiumGlassUI() {
     // 1. COSMIC DEEP BACKGROUND (For High Contrast)
     val cosmicBackground = Brush.verticalGradient(
         colors = listOf(
-            Color(0xFF0F172A), // Very Dark Blue (Top)
-            Color(0xFF3B0764), // Deep Rich Purple (Middle)
-            Color(0xFFBE185D), // Neon Pinkish (Bottom)
-            Color(0xFF1E1B4B)  // Dark Space Blue
+            Color(0xFF0F172A), 
+            Color(0xFF3B0764), 
+            Color(0xFFBE185D), 
+            Color(0xFF1E1B4B)  
         )
     )
 
@@ -70,7 +71,6 @@ fun UltraPremiumGlassUI() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Profile Avatar (Glowing)
                 Box(
                     modifier = Modifier.size(52.dp).shadow(10.dp, CircleShape).clip(CircleShape).background(Brush.linearGradient(listOf(Color(0xFF00F2FE), Color(0xFF4FACFE)))),
                     contentAlignment = Alignment.Center
@@ -88,7 +88,6 @@ fun UltraPremiumGlassUI() {
                 }
 
                 Row {
-                    // Notification Bell Glass
                     Box(modifier = Modifier.size(46.dp).clip(CircleShape).background(glassFill).border(1.5.dp, glassBorder, CircleShape), contentAlignment = Alignment.Center) {
                         Icon(Icons.Rounded.Notifications, contentDescription = null, tint = Color.White)
                         Box(modifier = Modifier.align(Alignment.TopEnd).padding(8.dp).size(10.dp).shadow(4.dp, CircleShape).clip(CircleShape).background(Color(0xFFFF0055)))
@@ -102,7 +101,7 @@ fun UltraPremiumGlassUI() {
 
             Spacer(modifier = Modifier.height(28.dp))
 
-            // --- MENU TABS (Neon Active Tab) ---
+            // --- MENU TABS ---
             Row(
                 modifier = Modifier.fillMaxWidth().height(48.dp).shadow(8.dp, RoundedCornerShape(24.dp)).clip(RoundedCornerShape(24.dp)).background(Color.White.copy(alpha=0.05f)).border(1.dp, glassBorder, RoundedCornerShape(24.dp)),
                 verticalAlignment = Alignment.CenterVertically,
@@ -124,16 +123,13 @@ fun UltraPremiumGlassUI() {
                     .size(260.dp)
                     .shadow(25.dp, CircleShape, spotColor = Color.Black)
                     .clip(CircleShape)
-                    // Real Metallic CD Shine using SweepGradient
                     .background(Brush.sweepGradient(listOf(Color(0xFF111111), Color(0xFF555555), Color(0xFF111111), Color(0xFF555555), Color(0xFF111111))))
                     .border(3.dp, Brush.linearGradient(listOf(Color(0xFF00F2FE), Color(0xFFFA709A))), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                // CD Grooves
                 Box(modifier = Modifier.size(200.dp).border(1.dp, Color.White.copy(alpha = 0.15f), CircleShape))
                 Box(modifier = Modifier.size(130.dp).border(1.dp, Color.White.copy(alpha = 0.1f), CircleShape))
                 
-                // Center Neon Hub
                 Box(modifier = Modifier.size(75.dp).shadow(10.dp, CircleShape).clip(CircleShape).background(Brush.radialGradient(listOf(Color(0xFFFA709A), Color(0xFFBF089A)))), contentAlignment = Alignment.Center) {
                     Icon(Icons.Rounded.MusicNote, contentDescription = null, tint = Color.White, modifier = Modifier.size(40.dp))
                 }
@@ -141,14 +137,13 @@ fun UltraPremiumGlassUI() {
 
             Spacer(modifier = Modifier.height(35.dp))
 
-            // --- MAIN MUSIC PLAYER CARD (Thick Glass with Drop Shadow) ---
+            // --- MAIN MUSIC PLAYER CARD ---
             Box(
                 modifier = Modifier.fillMaxWidth().shadow(20.dp, RoundedCornerShape(32.dp), spotColor = Color.Black.copy(alpha=0.5f)).clip(RoundedCornerShape(32.dp)).background(glassFill).border(1.5.dp, glassBorder, RoundedCornerShape(32.dp)).padding(24.dp)
             ) {
                 Column {
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            // Album Art Box
                             Box(modifier = Modifier.size(56.dp).shadow(8.dp, RoundedCornerShape(14.dp)).clip(RoundedCornerShape(14.dp)).background(Brush.linearGradient(listOf(Color(0xFF00C6FF), Color(0xFF0072FF)))))
                             Spacer(modifier = Modifier.width(16.dp))
                             Column {
@@ -161,7 +156,6 @@ fun UltraPremiumGlassUI() {
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Premium Progress Bar
                     Box(modifier = Modifier.fillMaxWidth().height(5.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.2f))) {
                         Box(modifier = Modifier.fillMaxWidth(0.45f).height(5.dp).clip(CircleShape).background(Brush.horizontalGradient(listOf(Color(0xFF00F2FE), Color(0xFFFA709A)))))
                         Box(modifier = Modifier.padding(start = 135.dp).size(14.dp).offset(y = (-4.5).dp).shadow(4.dp, CircleShape).clip(CircleShape).background(Color.White))
@@ -173,11 +167,9 @@ fun UltraPremiumGlassUI() {
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    // Controls
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Rounded.Shuffle, contentDescription = null, tint = Color.White.copy(alpha = 0.8f), modifier = Modifier.size(28.dp))
                         Icon(Icons.Rounded.SkipPrevious, contentDescription = null, tint = Color.White, modifier = Modifier.size(42.dp))
-                        // Big Play/Pause Button
                         Box(
                             modifier = Modifier.size(72.dp).shadow(10.dp, CircleShape).clip(CircleShape).background(glassFill).border(1.5.dp, glassBorder, CircleShape),
                             contentAlignment = Alignment.Center
@@ -192,7 +184,7 @@ fun UltraPremiumGlassUI() {
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // --- BOTTOM TOGGLES (Fixed Layout & Glass) ---
+            // --- BOTTOM TOGGLES ---
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Box(modifier = Modifier.weight(1f).height(65.dp).shadow(8.dp, RoundedCornerShape(24.dp)).clip(RoundedCornerShape(24.dp)).background(glassFill).border(1.dp, glassBorder, RoundedCornerShape(24.dp)), contentAlignment = Alignment.CenterStart) {
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 14.dp)) {
@@ -214,7 +206,7 @@ fun UltraPremiumGlassUI() {
             }
         }
 
-        // --- BOTTOM NAVIGATION BAR (Floating & Glowing) ---
+        // --- BOTTOM NAVIGATION BAR ---
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
